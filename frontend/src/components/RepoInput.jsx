@@ -35,7 +35,7 @@ const RepoInput = ({ value, onChange, onAnalyze, isLoading }) => {
         <button
           onClick={onAnalyze}
           disabled={isLoading || !value}
-          className="relative bg-text-primary hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed text-surface-black px-8 py-3 rounded-full font-medium transition-all flex items-center justify-center space-x-2 whitespace-nowrap"
+          className="relative bg-text-primary hover:bg-white hover:text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-surface-black px-8 py-3 rounded-full font-medium transition-all flex items-center justify-center space-x-2 whitespace-nowrap"
         >
           <span className="relative z-10 text-sm">
             {isLoading ? "Analyzing..." : "Analyze Repo"}

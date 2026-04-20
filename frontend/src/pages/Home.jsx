@@ -108,26 +108,10 @@ const NavBar = ({ isDark, toggleTheme }) => (
           <GitBranch size={16} className="text-white" />
         </div>
         <span className="font-bold text-lg text-text-primary tracking-[-0.16px]">
-          Supareview
+          Repo Review
         </span>
       </div>
       <div className="flex items-center space-x-6">
-        <a
-          href="https://github.com"
-          target="_blank"
-          rel="noreferrer"
-          className="text-sm font-medium text-text-secondary hover:text-brand-link transition-colors"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com"
-          target="_blank"
-          rel="noreferrer"
-          className="text-sm font-medium text-text-secondary hover:text-brand-link transition-colors"
-        >
-          Pricing
-        </a>
         <button
           onClick={toggleTheme}
           className="p-2 rounded-full bg-surface-black border border-border-dark text-text-muted hover:text-brand-green hover:border-brand-border transition-colors duration-300 shadow-sm"
@@ -136,12 +120,12 @@ const NavBar = ({ isDark, toggleTheme }) => (
           {isDark ? <Sun size={18} /> : <Moon size={18} />}
         </button>
         <a
-          href="https://github.com"
+          href="https://github.com/karan5772/ai-revierer"
           target="_blank"
           rel="noreferrer"
           className="bg-brand-green hover:bg-emerald-400 text-white px-5 py-2 rounded-full text-sm font-bold tracking-wide transition-all shadow-md shadow-brand-green/20"
         >
-          Start Reviewing
+          Star on Github
         </a>
       </div>
     </div>
@@ -154,24 +138,27 @@ const Footer = () => (
       <div className="flex items-center space-x-2 mb-4 md:mb-0">
         <GitBranch size={18} className="text-brand-green" />
         <span className="font-medium text-text-secondary text-sm">
-          © 2026 Supareview. Open Source.
+          © 2026 Repo Review. Open Source.
         </span>
       </div>
       <div className="flex space-x-6">
         <a
-          href="https://github.com"
+          href="https://github.com/karan5772"
+          target="_blank"
           className="text-text-muted hover:text-text-primary transition-colors"
         >
           <Github size={20} />
         </a>
         <a
-          href="https://twitter.com"
+          href="https://x.com/karankumar5772"
+          target="_blank"
           className="text-text-muted hover:text-text-primary transition-colors"
         >
           <Twitter size={20} />
         </a>
         <a
-          href="https://linkedin.com"
+          href="https://linkedin.com/in/karan5772"
+          target="_blank"
           className="text-text-muted hover:text-text-primary transition-colors"
         >
           <Linkedin size={20} />
