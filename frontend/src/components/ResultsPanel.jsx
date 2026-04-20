@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   AlertCircle,
   Lightbulb,
@@ -9,8 +9,10 @@ import {
   Info,
   ChevronDown,
   ChevronRight,
+  Maximize2,
+  X,
 } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import { Streamdown } from "streamdown";
 
 const groupItemsByFile = (items) => {
@@ -31,14 +33,18 @@ const DirectorySection = ({
   colorClass,
   borderClass,
   label,
+  onMaximize,
+  isMaximized,
 }) => {
-  const [openFiles, setOpenFiles] = React.useState({});
+  const [openFiles, setOpenFiles] = useState({});
   const toggleFile = (file) => {
     setOpenFiles((prev) => ({ ...prev, [file]: !prev[file] }));
   };
 
   return (
-    <div className="bg-surface-black rounded-2xl border border-border-dark h-full flex flex-col p-6">
+    <div
+      className={`bg-surface-black rounded-2xl border border-border-dark h-full flex flex-col ${isMaximized ? "p-8" : "p-6"}`}
+    >
       <div className="flex items-center text-text-primary mb-4 pb-4 border-b border-border-dark">
         <div className={`p-2 rounded-lg mr-3  border ${borderClass}`}>
           {icon}
@@ -46,8 +52,19 @@ const DirectorySection = ({
         <span className="font-semibold text-lg tracking-[-0.16px]">
           {label}
         </span>
+        {onMaximize && (
+          <button
+            onClick={onMaximize}
+            className="ml-auto p-2 hover:bg-surface-dark rounded-md text-text-muted hover:text-text-primary transition-colors focus:outline-none"
+            title={isMaximized ? "Close Fullscreen" : "View Fullscreen"}
+          >
+            {isMaximized ? <X size={20} /> : <Maximize2 size={18} />}
+          </button>
+        )}
       </div>
-      <div className="overflow-y-auto pr-2 max-h-[300px] text-sm">
+      <div
+        className={`overflow-y-auto pr-2 text-sm custom-scrollbar ${isMaximized ? "flex-grow min-h-0" : "max-h-[300px]"}`}
+      >
         {Object.entries(grouped).length === 0 ? (
           <div className="text-text-muted italic">
             No {label.toLowerCase()} detected.
@@ -99,6 +116,8 @@ const DirectorySection = ({
 };
 
 const ResultsPanel = ({ result, type }) => {
+  const [maximizedKey, setMaximizedKey] = useState(null);
+
   if (!result) return null;
 
   if (type === "stats") {
@@ -164,8 +183,106 @@ const ResultsPanel = ({ result, type }) => {
   }
 
   if (type === "details") {
+    // Generate maximized modal content
+    const renderMaximizedModal = () => {
+      if (!maximizedKey) return null;
+
+      let modalContent = null;
+
+      if (maximizedKey === "Issues") {
+        modalContent = (
+          <DirectorySection
+            grouped={groupItemsByFile(result.issues)}
+            icon={<AlertCircle size={24} strokeWidth={1.5} />}
+            colorClass="text-red-400 bg-red-950/20"
+            borderClass="border-red-900/30"
+            label="Issues"
+            isMaximized={true}
+            onMaximize={() => setMaximizedKey(null)}
+          />
+        );
+      } else if (maximizedKey === "Suggestions") {
+        modalContent = (
+          <DirectorySection
+            grouped={groupItemsByFile(result.suggestions)}
+            icon={<Lightbulb size={24} strokeWidth={1.5} />}
+            colorClass="text-yellow-400 bg-yellow-950/20"
+            borderClass="border-yellow-900/30"
+            label="Suggestions"
+            isMaximized={true}
+            onMaximize={() => setMaximizedKey(null)}
+          />
+        );
+      } else if (maximizedKey === "Security") {
+        modalContent = (
+          <DirectorySection
+            grouped={groupItemsByFile(result.security)}
+            icon={<ShieldAlert size={24} strokeWidth={1.5} />}
+            colorClass="text-indigo-400 bg-indigo-950/20"
+            borderClass="border-indigo-900/30"
+            label="Security"
+            isMaximized={true}
+            onMaximize={() => setMaximizedKey(null)}
+          />
+        );
+      } else if (maximizedKey === "Snippet Explanations") {
+        modalContent = (
+          <DirectorySection
+            grouped={groupItemsByFile(result.explanation)}
+            icon={<Info size={24} strokeWidth={1.5} />}
+            colorClass="text-text-secondary bg-surface-dark"
+            borderClass="border-border-subtle"
+            label="Snippet Explanations"
+            isMaximized={true}
+            onMaximize={() => setMaximizedKey(null)}
+          />
+        );
+      } else if (maximizedKey === "Repository Explanation") {
+        modalContent = (
+          <div className="bg-surface-black rounded-2xl border border-border-dark h-full flex flex-col p-8 w-full max-w-6xl mx-auto mt-4 mb-4">
+            <div className="flex items-center mb-6 border-b border-border-dark pb-6">
+              <div className="p-3 bg-brand-green/10 border border-brand-green/20 rounded-xl mr-4 text-brand-green">
+                <Info size={26} strokeWidth={1.5} />
+              </div>
+              <span className="font-bold text-2xl tracking-[-0.16px] text-text-primary">
+                Repository Explanation
+              </span>
+              <button
+                onClick={() => setMaximizedKey(null)}
+                className="ml-auto p-2 hover:bg-surface-dark rounded-md text-text-muted hover:text-text-primary transition-colors focus:outline-none"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="overflow-y-auto pr-4 flex-grow text-base whitespace-pre-wrap text-text-secondary leading-relaxed custom-scrollbar">
+              <Streamdown shikiTheme={["github-light", "github-light"]}>
+                {result.combinedExplanation}
+              </Streamdown>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-surface-black/90 backdrop-blur-sm p-4 md:p-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 10 }}
+            className="w-full max-w-6xl h-[90vh] flex flex-col shadow-2xl"
+          >
+            {modalContent}
+          </motion.div>
+        </div>
+      );
+    };
+
     return (
-      <div className="grid grid-cols-1 gap-6 w-full">
+      <div className="grid grid-cols-1 gap-6 w-full relative">
+        <AnimatePresence>
+          {maximizedKey && renderMaximizedModal()}
+        </AnimatePresence>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -178,6 +295,7 @@ const ResultsPanel = ({ result, type }) => {
               colorClass="text-red-400 bg-red-950/20"
               borderClass="border-red-900/30"
               label="Issues"
+              onMaximize={() => setMaximizedKey("Issues")}
             />
           </motion.div>
           <motion.div
@@ -191,6 +309,7 @@ const ResultsPanel = ({ result, type }) => {
               colorClass="text-yellow-400 bg-yellow-950/20"
               borderClass="border-yellow-900/30"
               label="Suggestions"
+              onMaximize={() => setMaximizedKey("Suggestions")}
             />
           </motion.div>
           <motion.div
@@ -204,6 +323,7 @@ const ResultsPanel = ({ result, type }) => {
               colorClass="text-indigo-400 bg-indigo-950/20"
               borderClass="border-indigo-900/30"
               label="Security"
+              onMaximize={() => setMaximizedKey("Security")}
             />
           </motion.div>
         </div>
@@ -221,6 +341,7 @@ const ResultsPanel = ({ result, type }) => {
                 colorClass="text-text-secondary bg-surface-dark"
                 borderClass="border-border-subtle"
                 label="Snippet Explanations"
+                onMaximize={() => setMaximizedKey("Snippet Explanations")}
               />
             </motion.div>
           )}
@@ -230,17 +351,26 @@ const ResultsPanel = ({ result, type }) => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="bg-surface-black rounded-2xl border border-border-dark h-full flex flex-col p-6"
+              className="bg-surface-black rounded-2xl border border-border-dark h-full flex flex-col p-6 relative group"
             >
-              <div className="flex items-center mb-4 border-b border-border-dark pb-4">
-                <div className="p-2 bg-brand-green/10 border border-brand-green/20 rounded-lg mr-3 text-brand-green">
-                  <Info size={20} strokeWidth={1.5} />
+              <div className="flex items-center justify-between mb-4 border-b border-border-dark pb-4">
+                <div className="flex items-center">
+                  <div className="p-2 bg-brand-green/10 border border-brand-green/20 rounded-lg mr-3 text-brand-green">
+                    <Info size={20} strokeWidth={1.5} />
+                  </div>
+                  <span className="font-semibold text-lg tracking-[-0.16px]">
+                    Repository Explanation
+                  </span>
                 </div>
-                <span className="font-semibold text-lg tracking-[-0.16px]">
-                  Repository Explanation
-                </span>
+                <button
+                  onClick={() => setMaximizedKey("Repository Explanation")}
+                  className="p-2 hover:bg-surface-dark rounded-md text-text-muted hover:text-text-primary transition-colors focus:outline-none opacity-0 group-hover:opacity-100"
+                  title="View Fullscreen"
+                >
+                  <Maximize2 size={18} />
+                </button>
               </div>
-              <div className="overflow-y-auto pr-2 max-h-[300px] text-[15px] whitespace-pre-wrap text-text-secondary leading-relaxed">
+              <div className="overflow-y-auto pr-2 max-h-[300px] text-[15px] whitespace-pre-wrap text-text-secondary leading-relaxed custom-scrollbar">
                 <Streamdown shikiTheme={["github-light", "github-light"]}>
                   {result.combinedExplanation}
                 </Streamdown>
