@@ -6,6 +6,7 @@ import {
   Activity,
   Award,
   CheckCircle2,
+  Info,
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -237,6 +238,54 @@ const ResultsPanel = ({ result, type }) => {
             )}
           </div>
         </motion.div>
+
+        {result.explanation && result.explanation.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="p-6 bg-white rounded-2xl shadow-sm border border-gray-200 h-full flex flex-col md:col-span-3"
+          >
+            <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
+              <div className="flex items-center text-gray-900">
+                <div className="p-2 bg-blue-50 rounded-lg mr-3 text-blue-600">
+                  <Info size={20} />
+                </div>
+                <span className="font-semibold text-lg">Code Explanation</span>
+              </div>
+              <span className="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">
+                {result.explanation.length}
+              </span>
+            </div>
+            <div className="space-y-4 overflow-y-auto pr-2 max-h-[300px] text-sm">
+              {Object.entries(groupItemsByFile(result.explanation)).map(
+                ([file, items], fileIdx) => (
+                  <div
+                    key={fileIdx}
+                    className="mb-4 last:mb-0 border-b border-gray-50 pb-3 last:border-0 last:pb-0"
+                  >
+                    <div
+                      className="text-xs font-mono text-gray-500 mb-2 truncate font-semibold bg-gray-50 py-1 px-2 rounded-md"
+                      title={file}
+                    >
+                      {file}
+                    </div>
+                    <ul className="space-y-2 text-gray-600 pl-1">
+                      {items.map((item, i) => (
+                        <li key={i} className="flex items-start">
+                          <span className="text-blue-500 mr-2 mt-0.5">•</span>
+                          <span className="whitespace-pre-wrap">
+                            {item.desc}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ),
+              )}
+            </div>
+          </motion.div>
+        )}
       </div>
     );
   }

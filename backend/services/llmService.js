@@ -23,7 +23,7 @@ class LLMService {
       throw new Error("No language provided for analysis");
     }
     console.log(`analyzeCode: language=${language}`);
-    const prompt = `Analyze the following code and return ONLY valid JSON matching this schema:\n\n{\n  \"issues\": string[],\n  \"suggestions\": string[],\n  \"security\": string[],\n  \"complexity\": number,\n  \"score\": number,\n  \"rating\": string\n}\n\nKeep descriptions extremely concise. If syntax issues repeat, mention them only once. Focus mainly on logic. The score must be out of 10. Rating must be one of: "Poor", "Fair", "Good", "Excellent". \n\nLanguage: ${language}\n\nCode:\n${code}`;
+    const prompt = `Analyze the following code and return ONLY valid JSON matching this schema:\n\n{\n  \"issues\": string[],\n  \"suggestions\": string[],\n  \"security\": string[],\n  \"explanation\": string[],\n  \"complexity\": number,\n  \"score\": number,\n  \"rating\": string\n}\n\nKeep descriptions extremely concise. If syntax issues repeat, mention them only once. Focus mainly on logic. Explain all the structure and functions of code in explanation. The score must be out of 10. Rating must be one of: "Poor", "Fair", "Good", "Excellent". \n\nLanguage: ${language}\n\nCode:\n${code}`;
     try {
       const completion = await groq.chat.completions.create({
         // model: "gpt-4.1-nano",

@@ -78,6 +78,8 @@ class RepoService {
             result.suggestions = result.suggestions.map(formatItem);
           if (Array.isArray(result.security))
             result.security = result.security.map(formatItem);
+          if (Array.isArray(result.explanation))
+            result.explanation = result.explanation.map(formatItem);
 
           results.push(result);
           console.log(`[RepoService] Analysis complete for: ${file}`);
@@ -122,6 +124,9 @@ class RepoService {
     const security = Array.from(
       new Set(results.flatMap((r) => r.security || [])),
     );
+    const explanation = Array.from(
+      new Set(results.flatMap((r) => r.explanation || [])),
+    );
     const avgComplexity =
       results.reduce((acc, r) => acc + (r.complexity || 0), 0) / totalFiles;
     const avgScore =
@@ -136,6 +141,7 @@ class RepoService {
       issues,
       suggestions,
       security,
+      explanation,
       complexity: Math.round(avgComplexity * 10) / 10,
       score: Math.round(avgScore),
       rating,
