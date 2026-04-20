@@ -255,9 +255,7 @@ const ResultsPanel = ({ result, type }) => {
               </button>
             </div>
             <div className="overflow-y-auto pr-4 flex-grow text-base whitespace-pre-wrap text-text-secondary leading-relaxed custom-scrollbar">
-              <Streamdown shikiTheme={["github-light", "github-light"]}>
-                {result.combinedExplanation}
-              </Streamdown>
+              <Streamdown>{result.combinedExplanation}</Streamdown>
             </div>
           </div>
         );
@@ -371,9 +369,7 @@ const ResultsPanel = ({ result, type }) => {
                 </button>
               </div>
               <div className="overflow-y-auto pr-2 max-h-[300px] text-[15px] whitespace-pre-wrap text-text-secondary leading-relaxed custom-scrollbar">
-                <Streamdown shikiTheme={["github-light", "github-light"]}>
-                  {result.combinedExplanation}
-                </Streamdown>
+                <Streamdown>{result.combinedExplanation}</Streamdown>
               </div>
             </motion.div>
           )}

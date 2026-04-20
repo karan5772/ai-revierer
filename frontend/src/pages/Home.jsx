@@ -108,7 +108,7 @@ const NavBar = ({ isDark, toggleTheme }) => (
           <GitBranch size={16} className="text-white" />
         </div>
         <span className="font-bold text-lg text-text-primary tracking-[-0.16px]">
-          Repo Review
+          RepoReview
         </span>
       </div>
       <div className="flex items-center space-x-6">
@@ -234,7 +234,7 @@ const Home = () => {
               className="inline-flex items-center space-x-2 bg-brand-green/10 text-brand-green px-4 py-1.5 rounded-full border border-brand-green/20 mb-6 font-medium text-sm shadow-sm"
             >
               <Zap size={16} fill="currentColor" />
-              <span>AI-Powered Code Reviewer</span>
+              <span>AI Powered Code Review Platform</span>
             </motion.div>
 
             <motion.h1
@@ -253,7 +253,7 @@ const Home = () => {
               transition={{ delay: 0.2 }}
               className="text-text-secondary text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8"
             >
-              Supareview instantly analyzes your repositories or code snippets
+              RepoReview instantly analyzes your repositories or code snippets
               to find bugs, assess complexity, and enforce security practices
               before you merge.
             </motion.p>
