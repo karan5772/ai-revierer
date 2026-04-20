@@ -1,1 +1,68 @@
 @import "tailwindcss";
+
+@theme {
+  --color-brand-green: var(--brand-green);
+  --color-brand-link: var(--brand-link);
+  --color-brand-border: var(--brand-border);
+
+  --color-surface-black: var(--surface-black);
+  --color-surface-dark: var(--surface-dark);
+  --color-surface-glass: var(--surface-glass);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-dark: var(--border-dark);
+  --color-border-mid: var(--border-mid);
+  --color-border-light: var(--border-light);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-dark: var(--text-dark);
+}
+
+@layer base {
+  :root {
+    --brand-green: #3ecf8e;
+    --brand-link: #00c573;
+    --brand-border: rgba(62, 207, 142, 0.3);
+
+    --surface-black: #ffffff;
+    --surface-dark: #f8f9fa;
+    --surface-glass: rgba(255, 255, 255, 0.84);
+
+    --border-subtle: #e5e5e5;
+    --border-dark: #d5d5d5;
+    --border-mid: #a3a3a3;
+    --border-light: #737373;
+
+    --text-primary: #171717;
+    --text-secondary: #4d4d4d;
+    --text-muted: #737373;
+    --text-dark: #898989;
+  }
+
+  .dark {
+    --brand-green: #3ecf8e;
+    --brand-link: #00c573;
+    --brand-border: rgba(62, 207, 142, 0.3);
+
+    --surface-black: #0f0f0f;
+    --surface-dark: #171717;
+    --surface-glass: rgba(41, 41, 41, 0.84);
+
+    --border-subtle: #242424;
+    --border-dark: #2e2e2e;
+    --border-mid: #363636;
+    --border-light: #393939;
+
+    --text-primary: #fafafa;
+    --text-secondary: #b4b4b4;
+    --text-muted: #898989;
+    --text-dark: #4d4d4d;
+  }
+
+  body {
+    background-color: var(--surface-dark);
+    color: var(--text-primary);
+  }
+}

@@ -7,8 +7,11 @@ import {
   Award,
   CheckCircle2,
   Info,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { motion } from "motion/react";
+import { Streamdown } from "streamdown";
 
 const groupItemsByFile = (items) => {
   if (!items || items.length === 0) return {};
@@ -16,11 +19,83 @@ const groupItemsByFile = (items) => {
     const parts = item.includes("::") ? item.split("::") : ["", item];
     const file = (parts.length > 1 ? parts[0] : "") || "General";
     const desc = parts.length > 1 ? parts.slice(1).join("::") : item;
-
     if (!acc[file]) acc[file] = [];
     acc[file].push({ desc, original: item });
     return acc;
   }, {});
+};
+
+const DirectorySection = ({
+  grouped,
+  icon,
+  colorClass,
+  borderClass,
+  label,
+}) => {
+  const [openFiles, setOpenFiles] = React.useState({});
+  const toggleFile = (file) => {
+    setOpenFiles((prev) => ({ ...prev, [file]: !prev[file] }));
+  };
+
+  return (
+    <div className="bg-surface-black rounded-2xl border border-border-dark h-full flex flex-col p-6">
+      <div className="flex items-center text-text-primary mb-4 pb-4 border-b border-border-dark">
+        <div className={`p-2 rounded-lg mr-3  border ${borderClass}`}>
+          {icon}
+        </div>
+        <span className="font-semibold text-lg tracking-[-0.16px]">
+          {label}
+        </span>
+      </div>
+      <div className="overflow-y-auto pr-2 max-h-[300px] text-sm">
+        {Object.entries(grouped).length === 0 ? (
+          <div className="text-text-muted italic">
+            No {label.toLowerCase()} detected.
+          </div>
+        ) : (
+          <ul className="space-y-3">
+            {Object.entries(grouped).map(([file, items], idx) => (
+              <li key={file} className="overflow-hidden">
+                <div
+                  className="flex items-center cursor-pointer select-none group py-1"
+                  onClick={() => toggleFile(file)}
+                >
+                  <span className="mr-2 transition-transform duration-200 text-text-muted group-hover:text-text-primary">
+                    {openFiles[file] ? (
+                      <ChevronDown size={16} />
+                    ) : (
+                      <ChevronRight size={16} />
+                    )}
+                  </span>
+                  <span
+                    className="text-[13px] font-mono text-text-secondary truncate bg-surface-dark border border-border-subtle py-1 px-2 rounded-md transition-colors group-hover:text-text-primary group-hover:border-border-mid"
+                    title={file}
+                  >
+                    {file}
+                  </span>
+                  <span className="ml-2 text-xs font-mono text-text-muted bg-surface-dark px-1.5 rounded-full">
+                    {items.length}
+                  </span>
+                </div>
+                {openFiles[file] && (
+                  <ul className="space-y-2 mt-2 ml-6 border-l border-border-dark pl-4 pb-2">
+                    {items.map((item, i) => (
+                      <li key={i} className="flex items-start text-[14px]">
+                        <span className={`mr-2 mt-[4px] `}>•</span>
+                        <span className="whitespace-pre-wrap text-text-secondary leading-relaxed">
+                          {item.desc}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
 };
 
 const ResultsPanel = ({ result, type }) => {
@@ -32,16 +107,16 @@ const ResultsPanel = ({ result, type }) => {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center space-x-5"
+          className="p-6 bg-surface-black rounded-2xl border border-border-dark flex items-center space-x-5 shadow-sm"
         >
-          <div className="p-3 bg-blue-50 rounded-xl text-blue-600 border border-blue-100">
-            <Award size={26} />
+          <div className="p-3 bg-brand-green/10 rounded-xl text-brand-green border border-border-subtle">
+            <Award size={26} strokeWidth={1.5} />
           </div>
           <div>
-            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">
+            <p className="text-xs text-text-muted font-semibold uppercase tracking-[1.2px] mb-1 font-mono">
               Score
             </p>
-            <p className="text-3xl font-extrabold text-gray-900">
+            <p className="text-3xl font-normal text-text-primary tracking-tight">
               {result.score}/10
             </p>
           </div>
@@ -51,16 +126,16 @@ const ResultsPanel = ({ result, type }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="p-6 bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center space-x-5"
+          className="p-6 bg-surface-black rounded-2xl border border-border-dark flex items-center space-x-5 shadow-sm"
         >
-          <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600 border border-indigo-100">
-            <Activity size={26} />
+          <div className="p-3 bg-surface-dark rounded-xl text-text-secondary border border-border-subtle">
+            <Activity size={26} strokeWidth={1.5} />
           </div>
           <div>
-            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">
+            <p className="text-xs text-text-muted font-semibold uppercase tracking-[1.2px] mb-1 font-mono">
               Complexity
             </p>
-            <p className="text-3xl font-extrabold text-gray-900">
+            <p className="text-3xl font-normal text-text-primary tracking-tight">
               {result.complexity}/10
             </p>
           </div>
@@ -70,16 +145,16 @@ const ResultsPanel = ({ result, type }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="p-6 bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center space-x-5"
+          className="p-6 bg-surface-black rounded-2xl border border-border-dark flex items-center space-x-5 shadow-sm"
         >
-          <div className="p-3 bg-emerald-50 rounded-xl text-emerald-600 border border-emerald-100">
-            <CheckCircle2 size={26} />
+          <div className="p-3 bg-surface-dark rounded-xl text-text-secondary border border-border-subtle">
+            <CheckCircle2 size={26} strokeWidth={1.5} />
           </div>
           <div>
-            <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">
+            <p className="text-xs text-text-muted font-semibold uppercase tracking-[1.2px] mb-1 font-mono">
               Rating
             </p>
-            <p className="text-3xl font-extrabold text-gray-900">
+            <p className="text-3xl font-normal text-text-primary tracking-tight">
               {result.rating}
             </p>
           </div>
@@ -90,202 +165,89 @@ const ResultsPanel = ({ result, type }) => {
 
   if (type === "details") {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="p-6 bg-white rounded-2xl shadow-sm border border-gray-200 h-full flex flex-col"
-        >
-          <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
-            <div className="flex items-center text-gray-900">
-              <div className="p-2 bg-red-50 rounded-lg mr-3 text-red-600">
-                <AlertCircle size={20} />
-              </div>
-              <span className="font-semibold text-lg">Issues</span>
-            </div>
-            <span className="bg-red-50 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full">
-              {result.issues?.length || 0}
-            </span>
-          </div>
-          <div className="space-y-4 overflow-y-auto pr-2 max-h-[300px] text-sm">
-            {result.issues && result.issues.length > 0 ? (
-              Object.entries(groupItemsByFile(result.issues)).map(
-                ([file, items], fileIdx) => (
-                  <div
-                    key={fileIdx}
-                    className="mb-4 last:mb-0 border-b border-gray-50 pb-3 last:border-0 last:pb-0"
-                  >
-                    <div
-                      className="text-xs font-mono text-gray-500 mb-2 truncate font-semibold bg-gray-50 py-1 px-2 rounded-md"
-                      title={file}
-                    >
-                      {file}
-                    </div>
-                    <ul className="space-y-2 text-gray-600 pl-1">
-                      {items.map((item, i) => (
-                        <li key={i} className="flex items-start">
-                          <span className="text-red-500 mr-2 mt-0.5">•</span>
-                          <span>{item.desc}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ),
-              )
-            ) : (
-              <div className="text-gray-400 italic">No issues detected.</div>
-            )}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="p-6 bg-white rounded-2xl shadow-sm border border-gray-200 h-full flex flex-col"
-        >
-          <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
-            <div className="flex items-center text-gray-900">
-              <div className="p-2 bg-amber-50 rounded-lg mr-3 text-amber-600">
-                <Lightbulb size={20} />
-              </div>
-              <span className="font-semibold text-lg">Suggestions</span>
-            </div>
-            <span className="bg-amber-50 text-amber-600 text-xs font-bold px-2.5 py-1 rounded-full">
-              {result.suggestions?.length || 0}
-            </span>
-          </div>
-          <div className="space-y-4 overflow-y-auto pr-2 max-h-[300px] text-sm">
-            {result.suggestions && result.suggestions.length > 0 ? (
-              Object.entries(groupItemsByFile(result.suggestions)).map(
-                ([file, items], fileIdx) => (
-                  <div
-                    key={fileIdx}
-                    className="mb-4 last:mb-0 border-b border-gray-50 pb-3 last:border-0 last:pb-0"
-                  >
-                    <div
-                      className="text-xs font-mono text-gray-500 mb-2 truncate font-semibold bg-gray-50 py-1 px-2 rounded-md"
-                      title={file}
-                    >
-                      {file}
-                    </div>
-                    <ul className="space-y-2 text-gray-600 pl-1">
-                      {items.map((item, i) => (
-                        <li key={i} className="flex items-start">
-                          <span className="text-amber-500 mr-2 mt-0.5">•</span>
-                          <span>{item.desc}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ),
-              )
-            ) : (
-              <div className="text-gray-400 italic">
-                No suggestions available.
-              </div>
-            )}
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="p-6 bg-white rounded-2xl shadow-sm border border-gray-200 h-full flex flex-col"
-        >
-          <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
-            <div className="flex items-center text-gray-900">
-              <div className="p-2 bg-indigo-50 rounded-lg mr-3 text-indigo-600">
-                <ShieldAlert size={20} />
-              </div>
-              <span className="font-semibold text-lg">Security</span>
-            </div>
-            <span className="bg-indigo-50 text-indigo-600 text-xs font-bold px-2.5 py-1 rounded-full">
-              {result.security?.length || 0}
-            </span>
-          </div>
-          <div className="space-y-4 overflow-y-auto pr-2 max-h-[300px] text-sm">
-            {result.security && result.security.length > 0 ? (
-              Object.entries(groupItemsByFile(result.security)).map(
-                ([file, items], fileIdx) => (
-                  <div
-                    key={fileIdx}
-                    className="mb-4 last:mb-0 border-b border-gray-50 pb-3 last:border-0 last:pb-0"
-                  >
-                    <div
-                      className="text-xs font-mono text-gray-500 mb-2 truncate font-semibold bg-gray-50 py-1 px-2 rounded-md"
-                      title={file}
-                    >
-                      {file}
-                    </div>
-                    <ul className="space-y-2 text-gray-600 pl-1">
-                      {items.map((item, i) => (
-                        <li key={i} className="flex items-start">
-                          <span className="text-indigo-500 mr-2 mt-0.5">•</span>
-                          <span>{item.desc}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ),
-              )
-            ) : (
-              <div className="text-emerald-600 font-medium flex items-center">
-                <CheckCircle2 size={16} className="mr-1.5" /> Secure
-              </div>
-            )}
-          </div>
-        </motion.div>
-
-        {result.explanation && result.explanation.length > 0 && (
+      <div className="grid grid-cols-1 gap-6 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="p-6 bg-white rounded-2xl shadow-sm border border-gray-200 h-full flex flex-col md:col-span-3"
+            transition={{ delay: 0.3 }}
           >
-            <div className="flex items-center justify-between mb-4 border-b border-gray-100 pb-4">
-              <div className="flex items-center text-gray-900">
-                <div className="p-2 bg-blue-50 rounded-lg mr-3 text-blue-600">
-                  <Info size={20} />
-                </div>
-                <span className="font-semibold text-lg">Code Explanation</span>
-              </div>
-              <span className="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full">
-                {result.explanation.length}
-              </span>
-            </div>
-            <div className="space-y-4 overflow-y-auto pr-2 max-h-[300px] text-sm">
-              {Object.entries(groupItemsByFile(result.explanation)).map(
-                ([file, items], fileIdx) => (
-                  <div
-                    key={fileIdx}
-                    className="mb-4 last:mb-0 border-b border-gray-50 pb-3 last:border-0 last:pb-0"
-                  >
-                    <div
-                      className="text-xs font-mono text-gray-500 mb-2 truncate font-semibold bg-gray-50 py-1 px-2 rounded-md"
-                      title={file}
-                    >
-                      {file}
-                    </div>
-                    <ul className="space-y-2 text-gray-600 pl-1">
-                      {items.map((item, i) => (
-                        <li key={i} className="flex items-start">
-                          <span className="text-blue-500 mr-2 mt-0.5">•</span>
-                          <span className="whitespace-pre-wrap">
-                            {item.desc}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ),
-              )}
-            </div>
+            <DirectorySection
+              grouped={groupItemsByFile(result.issues)}
+              icon={<AlertCircle size={20} strokeWidth={1.5} />}
+              colorClass="text-red-400 bg-red-950/20"
+              borderClass="border-red-900/30"
+              label="Issues"
+            />
           </motion.div>
-        )}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <DirectorySection
+              grouped={groupItemsByFile(result.suggestions)}
+              icon={<Lightbulb size={20} strokeWidth={1.5} />}
+              colorClass="text-yellow-400 bg-yellow-950/20"
+              borderClass="border-yellow-900/30"
+              label="Suggestions"
+            />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <DirectorySection
+              grouped={groupItemsByFile(result.security)}
+              icon={<ShieldAlert size={20} strokeWidth={1.5} />}
+              colorClass="text-indigo-400 bg-indigo-950/20"
+              borderClass="border-indigo-900/30"
+              label="Security"
+            />
+          </motion.div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          {result.explanation && result.explanation.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
+              <DirectorySection
+                grouped={groupItemsByFile(result.explanation)}
+                icon={<Info size={20} strokeWidth={1.5} />}
+                colorClass="text-text-secondary bg-surface-dark"
+                borderClass="border-border-subtle"
+                label="Snippet Explanations"
+              />
+            </motion.div>
+          )}
+
+          {result.combinedExplanation && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="bg-surface-black rounded-2xl border border-border-dark h-full flex flex-col p-6"
+            >
+              <div className="flex items-center mb-4 border-b border-border-dark pb-4">
+                <div className="p-2 bg-brand-green/10 border border-brand-green/20 rounded-lg mr-3 text-brand-green">
+                  <Info size={20} strokeWidth={1.5} />
+                </div>
+                <span className="font-semibold text-lg tracking-[-0.16px]">
+                  Repository Explanation
+                </span>
+              </div>
+              <div className="overflow-y-auto pr-2 max-h-[300px] text-[15px] whitespace-pre-wrap text-text-secondary leading-relaxed">
+                <Streamdown shikiTheme={["github-light", "github-light"]}>
+                  {result.combinedExplanation}
+                </Streamdown>
+              </div>
+            </motion.div>
+          )}
+        </div>
       </div>
     );
   }
