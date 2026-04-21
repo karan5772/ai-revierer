@@ -21,7 +21,7 @@ async function generateRepoSummary(explanation) {
       messages: [
         {
           role: "user",
-          content: `Here is the explanation of codes in different files in a repo, explain the structure and functions of code in simple terms in markdown as if you are explaining the entire repo and it's working. Please provide a JSON object with a "summary" key.\n\n explanation: \n\n ${JSON.stringify(explanation)}`,
+          content: `Here is the explanation of codes in different files in a repo, explain the structure and functions of code in simple terms as if you are explaining the entire repo and it's working. \n The output will follow markdown format.\nThe output will follow markdown format.\n\n Please provide a JSON object with a "summary" key.\n \n explanation: \n\n ${JSON.stringify(explanation)}`,
         },
       ],
       response_format: { type: "json_object" },
